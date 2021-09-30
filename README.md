@@ -1,6 +1,12 @@
 # BotPVU Farm Notification
 The proposal of this bot is not need to open the website of Plant Vs undead in order to check the status of my farm. The email sent require email configuration using an SMTP server
 
+### How its works?
+- Download the last release zip file.
+- Extract on any folder tha tyou want.
+- Modify the file appsettings.json using the following steps
+- Double click BotPVU.exe file
+
 ### Configuration
 For configuration only need to open the appsettings.json file and fill the following information
 ```json
