@@ -16,5 +16,7 @@ namespace BotPVU.Models
         public static int SmtpPort = 0;
         public static string SmtpUserName = "";
         public static string SmtpPassword = "";
+        public static bool AutoFarming = true;
+        public static int AutoFarmingDelay = 0;
     }
 }

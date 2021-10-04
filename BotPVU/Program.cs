@@ -56,6 +56,7 @@ namespace BotPVU
                         Console.WriteLine("-- Need Harvers: " + res.data.Where(x => x.totalHarvest != 0).Count().ToString());
                         foreach (var plant in res.data)
                         {
+                            
                             if (plant.needWater)
                             {
                                 if (plantsWaterNeed.FirstOrDefault(x => x == plant._id) == null)
@@ -63,6 +64,11 @@ namespace BotPVU
                                     MailHelper.sendEmail("The plant need water", "The plant " + plant._id + " need water");
                                     Console.WriteLine("The plant " + plant._id + " need water");
                                     plantsWaterNeed.Add(plant._id);
+                                    if(Models.Configuration.AutoFarming)
+                                    {
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.UseTool(plant._id, 3);
+                                    }
                                 }
                             }
                             else
@@ -77,6 +83,11 @@ namespace BotPVU
                                     MailHelper.sendEmail("The plant have a crow", "The plant " + plant._id + " have a crow");
                                     Console.WriteLine("The plant " + plant._id + " have a crow");
                                     plantscrow.Add(plant._id);
+                                    if (Models.Configuration.AutoFarming)
+                                    {
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.UseTool(plant._id, 4);
+                                    }
                                 }
                             }
                             else
@@ -105,6 +116,11 @@ namespace BotPVU
                                     MailHelper.sendEmail("The plant is ready to harvest", "The plan " + plant._id + " is ready to harvers");
                                     Console.WriteLine("The plan " + plant._id + " is ready to harvers");
                                     plantNeedHarvest.Add(plant._id);
+                                    if (Models.Configuration.AutoFarming)
+                                    {
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.HarvestAll();
+                                    }
                                 }
                             }
                             else
@@ -159,6 +175,8 @@ namespace BotPVU
             Models.Configuration.SmtpServerSSL = configuration.GetSection("SmtpServerSSL").Get<bool>();
             Models.Configuration.SmtpUserName = configuration.GetSection("SmtpUserName").Get<string>();
             Models.Configuration.SmtpPassword = configuration.GetSection("SmtpPassword").Get<string>();
+            Models.Configuration.AutoFarming = configuration.GetSection("AutoFarming").Get<bool>();
+            Models.Configuration.AutoFarmingDelay = configuration.GetSection("AutoFarmingDelay").Get<int>();
 
         }
     }

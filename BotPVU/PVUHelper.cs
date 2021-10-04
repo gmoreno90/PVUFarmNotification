@@ -154,6 +154,7 @@ namespace BotPVU
             }
             else if (method == "POST")
             {
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 return client.UploadString(url, dataToPost);
             }
             else return "";
