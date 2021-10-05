@@ -68,6 +68,8 @@ namespace BotPVU
                                     {
                                         System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
                                         PVUHelper.UseTool(plant._id, 3);
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.UseTool(plant._id, 3);
                                     }
                                 }
                             }
