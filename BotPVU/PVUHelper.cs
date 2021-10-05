@@ -36,7 +36,7 @@ namespace BotPVU
         /// <param name="farmId">_id</param>
         /// <param name="toolId">1 Small Port, 2 Big POT, 3 water, 4 scarecrow, 5 greenhouse</param>
         /// <returns></returns>
-        public static Models.PVU.GetFarmResponse UseTool(string farmId, int toolId)
+        public static Models.PVU.ApplyToolResponse UseTool(string farmId, int toolId)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace BotPVU
                     }
                 };
                 var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms/apply-tool", "POST", JsonSerializer.Serialize(rq).ToString());
-                var objRes = JsonSerializer.Deserialize<Models.PVU.GetFarmResponse>(jsonString);
+                var objRes = JsonSerializer.Deserialize<Models.PVU.ApplyToolResponse>(jsonString);
                 return objRes;
             }
             catch (Exception ex)
