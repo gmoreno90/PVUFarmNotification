@@ -18,5 +18,8 @@ namespace BotPVU.Models
         public static string SmtpPassword = "";
         public static bool AutoFarming = true;
         public static int AutoFarmingDelay = 0;
+        public static string UserAgent = "";
+        public static string BackendEndpoint = "";
+        public static List<string> MyPlants = new List<string>();
     }
 }

@@ -39,6 +39,7 @@ namespace BotPVU
                 List<string> plantscrow = new List<string>();
                 List<string> plantWithSeed = new List<string>();
                 List<string> plantNeedHarvest = new List<string>();
+                List<string> plantNew = new List<string>();
                 Console.Title = "PVU Farm Notification";
                 Console.WriteLine("--- Checking PVU FARM ---");
                 while (!Console.KeyAvailable)
@@ -47,16 +48,51 @@ namespace BotPVU
                     var res = PVUHelper.getFarmInfo();
                     if (res != null)
                     {
-
+                        while (res.data.Count != Models.Configuration.MyPlants.Count)
+                        {
+                            foreach (var item in Models.Configuration.MyPlants)
+                            {
+                                if (res.data.FirstOrDefault(x => x.plantId.ToString() == item) == null)
+                                {
+                                    if (Models.Configuration.AutoFarming)
+                                    {
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.PlantPlant("0", item);
+                                        Console.WriteLine("Plant a new plant " + item + "");
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        res = PVUHelper.getFarmInfo();
+                                    }
+                                }
+                            }
+                        }
                         Console.WriteLine("Farm Information --- " + DateTime.Now.ToString());
                         Console.WriteLine("-- Plants: " + res.data.Count.ToString());
                         Console.WriteLine("-- Need Water: " + res.data.Where(x => x.needWater).Count().ToString());
                         Console.WriteLine("-- Have Crow: " + res.data.Where(x => x.stage == "paused").Count().ToString());
+                        Console.WriteLine("-- Is New: " + res.data.Where(x => x.stage == "new").Count().ToString());
                         Console.WriteLine("-- Have Seed: " + res.data.Where(x => x.hasSeed).Count().ToString());
                         Console.WriteLine("-- Need Harvers: " + res.data.Where(x => x.totalHarvest != 0).Count().ToString());
                         foreach (var plant in res.data)
                         {
-                            
+                            if (plant.stage == "new")
+                            {
+                                if (plantNew.FirstOrDefault(x => x == plant._id) == null)
+                                {
+                                    MailHelper.sendEmail("The plant is new", "The plant " + plant._id + " is new");
+                                    Console.WriteLine("The plant " + plant._id + " is new");
+                                    plantNew.Add(plant._id);
+                                    if (Models.Configuration.AutoFarming)
+                                    {
+                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                        PVUHelper.UseTool(plant._id, 1);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (plantNew.FirstOrDefault(x => x == plant._id) != null)
+                                    plantNew.Remove(plant._id);
+                            }
                             if (plant.needWater)
                             {
                                 if (plantsWaterNeed.FirstOrDefault(x => x == plant._id) == null)
@@ -64,10 +100,8 @@ namespace BotPVU
                                     MailHelper.sendEmail("The plant need water", "The plant " + plant._id + " need water");
                                     Console.WriteLine("The plant " + plant._id + " need water");
                                     plantsWaterNeed.Add(plant._id);
-                                    if(Models.Configuration.AutoFarming)
+                                    if (Models.Configuration.AutoFarming)
                                     {
-                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
-                                        PVUHelper.UseTool(plant._id, 3);
                                         System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
                                         PVUHelper.UseTool(plant._id, 3);
                                     }
@@ -179,7 +213,9 @@ namespace BotPVU
             Models.Configuration.SmtpPassword = configuration.GetSection("SmtpPassword").Get<string>();
             Models.Configuration.AutoFarming = configuration.GetSection("AutoFarming").Get<bool>();
             Models.Configuration.AutoFarmingDelay = configuration.GetSection("AutoFarmingDelay").Get<int>();
-
+            Models.Configuration.MyPlants = configuration.GetSection("MyPlants").Get<List<string>>();
+            Models.Configuration.UserAgent = configuration.GetSection("UserAgent").Get<string>();
+            Models.Configuration.BackendEndpoint = configuration.GetSection("BackendEndpoint").Get<string>();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace BotPVU
         {
             try
             {
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms?limit=10&offset=0", "GET");
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms?limit=10&offset=0", "GET");
                 var objRes = JsonSerializer.Deserialize<Models.PVU.GetFarmResponse>(jsonString);
                 return objRes;
             }
@@ -51,8 +51,29 @@ namespace BotPVU
                         validate = "default"
                     }
                 };
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms/apply-tool", "POST", JsonSerializer.Serialize(rq).ToString());
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/apply-tool", "POST", JsonSerializer.Serialize(rq).ToString());
                 var objRes = JsonSerializer.Deserialize<Models.PVU.ApplyToolResponse>(jsonString);
+                return objRes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+
+        public static Models.PVU.PlantPlantResponse PlantPlant(string landId, string plantId)
+        {
+            try
+            {
+                var rq = new Models.PVU.PlantPlantRequest()
+                {
+                    landId = long.Parse(landId),
+                    plantId = long.Parse(plantId)
+                };
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms", "POST", JsonSerializer.Serialize(rq).ToString());
+                var objRes = JsonSerializer.Deserialize<Models.PVU.PlantPlantResponse>(jsonString);
                 return objRes;
             }
             catch (Exception ex)
@@ -72,7 +93,7 @@ namespace BotPVU
             try
             {
 
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/world-tree/datas", "GET");
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/world-tree/datas", "GET");
                 var objRes = JsonSerializer.Deserialize<Models.PVU.WordTreeResponse>(jsonString);
                 return objRes;
             }
@@ -99,7 +120,7 @@ namespace BotPVU
                     amount = amount,
                     sunflowerId = sunFlowerType
                 };
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/buy-sunflowers", "POST", JsonSerializer.Serialize(rq).ToString());
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/buy-sunflowers", "POST", JsonSerializer.Serialize(rq).ToString());
                 var objRes = JsonSerializer.Deserialize<Models.PVU.BuySunFlowerResponse>(jsonString);
                 return objRes;
             }
@@ -120,7 +141,7 @@ namespace BotPVU
         {
             try
             {
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms/harvest-all", "POST");
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/harvest-all", "POST");
                 var objRes = JsonSerializer.Deserialize<Models.PVU.BuySunFlowerResponse>(jsonString);
                 return objRes;
             }
@@ -144,7 +165,7 @@ namespace BotPVU
             // Add a user agent header in case the 
             // requested URI contains a query.
 
-            client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36");
+            client.Headers.Add("User-Agent", Models.Configuration.UserAgent);
             client.Headers.Add("Origin", "https://marketplace.plantvsundead.com");
             client.Headers.Add("Referer", "https://marketplace.plantvsundead.com/");
             client.Headers.Add("Authorization", "Bearer Token: " + Models.Configuration.AuthPVUToken);

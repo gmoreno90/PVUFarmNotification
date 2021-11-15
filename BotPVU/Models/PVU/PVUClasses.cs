@@ -139,7 +139,20 @@ namespace BotPVU.Models.PVU
         public int toolId { get; set; }
         public Token token { get; set; }
     }
+    
     public class ApplyToolResponse
+    {
+        public int status { get; set; }
+        public object data { get; set; }
+    }
+
+    public class PlantPlantRequest
+    {
+        public long landId { get; set; }
+        public long plantId { get; set; }
+    }
+
+    public class PlantPlantResponse
     {
         public int status { get; set; }
         public object data { get; set; }
