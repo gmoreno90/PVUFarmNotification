@@ -20,7 +20,10 @@ For configuration only need to open the appsettings.json file and fill the follo
   "SmtpUserName": "example@mail.com",
   "SmtpPassword": "YourEmailPassword",
   "AutoFarming": false,
-  "AutoFarmingDelay": 3000
+  "AutoFarmingDelay": 3000,
+  "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36",
+  "BackendEndpoint": "https://backend-farm.plantvsundead.com",
+  "MyPlants": [ "1234", "1235" ]
 }
 ```
 ### How get the Bearer Token?
