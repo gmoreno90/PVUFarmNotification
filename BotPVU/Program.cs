@@ -46,21 +46,30 @@ namespace BotPVU
                 {
 
                     var res = PVUHelper.getFarmInfo();
+                    var resWeather = PVUHelper.GetWeatherToday();
+                    var resFreeSlots = PVUHelper.GetFreeSlots();
                     if (res != null)
                     {
-                        while (res.data.Count != Models.Configuration.MyPlants.Count)
+                        var plantsPerWeather = getPlantsByWeather(resWeather.data.season);
+                        while (res.data.Count != plantsPerWeather.Count)
                         {
-                            foreach (var item in Models.Configuration.MyPlants)
+                            foreach (var item in plantsPerWeather)
                             {
                                 if (res.data.FirstOrDefault(x => x.plantId.ToString() == item) == null)
                                 {
                                     if (Models.Configuration.AutoFarming)
                                     {
-                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
-                                        PVUHelper.PlantPlant("0", item);
-                                        Console.WriteLine("Plant a new plant " + item + "");
-                                        System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
-                                        res = PVUHelper.getFarmInfo();
+                                        //check if have free slots for get the farm _id
+                                        if(resFreeSlots.data.farm != null && resFreeSlots.data.farm.Count() > 0)
+                                        {
+                                            System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                            PVUHelper.AddPlant(resFreeSlots.data.farm.FirstOrDefault()._id, "0", item);
+                                            Console.WriteLine("Plant a new plant " + item + "");
+                                            System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
+                                            res = PVUHelper.getFarmInfo();
+                                            resFreeSlots = PVUHelper.GetFreeSlots();
+                                        }
+                                        
                                     }
                                 }
                             }
@@ -155,7 +164,7 @@ namespace BotPVU
                                     if (Models.Configuration.AutoFarming)
                                     {
                                         System.Threading.Thread.Sleep(Models.Configuration.AutoFarmingDelay);
-                                        PVUHelper.HarvestAll();
+                                        PVUHelper.HarvestPlant(plant._id);
                                     }
                                 }
                             }
@@ -191,7 +200,22 @@ namespace BotPVU
         }
 
 
-
+        private static List<string> getPlantsByWeather(string weather)
+        {
+            switch (weather.ToLower())
+            {
+                case "spring":
+                    return Models.Configuration.MyPlantsSpring;
+                case "summer":
+                    return Models.Configuration.MyPlantsSummer;
+                case "autumn":
+                    return Models.Configuration.MyPlantsAutumn;
+                case "winter":
+                    return Models.Configuration.MyPlantsWinter;
+                default:
+                    return new List<string>();
+            }
+        }
         private static void ConfigureServices(IServiceCollection serviceCollection)
         {
 
@@ -213,9 +237,14 @@ namespace BotPVU
             Models.Configuration.SmtpPassword = configuration.GetSection("SmtpPassword").Get<string>();
             Models.Configuration.AutoFarming = configuration.GetSection("AutoFarming").Get<bool>();
             Models.Configuration.AutoFarmingDelay = configuration.GetSection("AutoFarmingDelay").Get<int>();
-            Models.Configuration.MyPlants = configuration.GetSection("MyPlants").Get<List<string>>();
+            Models.Configuration.MyPlantsSpring = configuration.GetSection("MyPlantsSpring").Get<List<string>>();
+            Models.Configuration.MyPlantsSummer = configuration.GetSection("MyPlantsSummer").Get<List<string>>();
+            Models.Configuration.MyPlantsAutumn = configuration.GetSection("MyPlantsAutumn").Get<List<string>>();
+            Models.Configuration.MyPlantsWinter = configuration.GetSection("MyPlantsWinter").Get<List<string>>();
             Models.Configuration.UserAgent = configuration.GetSection("UserAgent").Get<string>();
             Models.Configuration.BackendEndpoint = configuration.GetSection("BackendEndpoint").Get<string>();
+            Models.Configuration.ResponseMessages = configuration.GetSection("ResponseMessages").Get<List<string>>();
+            Models.Configuration.PrintLogResponses = configuration.GetSection("PrintLogResponses").Get<bool>();
         }
     }
 }
