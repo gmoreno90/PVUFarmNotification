@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -140,6 +141,28 @@ namespace BotPVU.Models.PVU
         public Token token { get; set; }
     }
 
+    public class ApplyToolResponse
+    {
+        public int status { get; set; }
+        public object data { get; set; }
+    }
+
+    public class PlantPlantRequest
+    {
+        public string farmId { get; set; }
+        public string landId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string plantId { get; set; }
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+        public string sunflowerId { get; set; }
+    }
+
+    public class PlantPlantResponse
+    {
+        public int status { get; set; }
+        public object data { get; set; }
+    }
+
     public class Reward
     {
         public int type { get; set; }
@@ -163,11 +186,20 @@ namespace BotPVU.Models.PVU
         public int status { get; set; }
         public DataWordTree data { get; set; }
     }
-    
+
     public class BuySunFlowerRequest
     {
         public int amount { get; set; }
         public int sunflowerId { get; set; }
+    }
+    public class HarvestPlantRequest
+    {
+        public long plantId { get; set; }
+    }
+    public class HarvestPlantResponse
+    {
+        public int status { get; set; }
+        public object data { get; set; }
     }
 
     public class DataBuySunFlower
@@ -182,4 +214,169 @@ namespace BotPVU.Models.PVU
         public int status { get; set; }
         public DataBuySunFlower data { get; set; }
     }
+
+
+    public class WeatherTodayResponse
+    {
+        public int status { get; set; }
+        public DataWeather data { get; set; }
+    }
+
+    public class DataWeather
+    {
+        public string[] allowedPlants { get; set; }
+        public string season { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public DateTime startTime { get; set; }
+        public DateTime endTime { get; set; }
+        public DateTime seasonEndTime { get; set; }
+        public DateTime seasonStartTime { get; set; }
+        public string eventFunction { get; set; }
+        public string timezone { get; set; }
+    }
+
+
+    public class FreeSlotResponse
+    {
+        public int status { get; set; }
+        public DataFreeSlotResponse data { get; set; }
+    }
+
+    public class DataFreeSlotResponse
+    {
+        public FarmFreeSlotResponse[] farm { get; set; }
+        public AvailableslotFreeSlotResponse[] availableSlots { get; set; }
+    }
+
+    public class FarmFreeSlotResponse
+    {
+        public string _id { get; set; }
+        public LandFreeSlotResponse land { get; set; }
+        public MetaFreeSlotResponse meta { get; set; }
+        public string stage { get; set; }
+        public string ownerId { get; set; }
+        public int landId { get; set; }
+        public ActivetoolFreeSlotResponse[] activeTools { get; set; }
+        public DateTime createdAt { get; set; }
+        public DateTime updatedAt { get; set; }
+        public int __v { get; set; }
+        public object harvestTime { get; set; }
+        public object startTime { get; set; }
+        public bool needWater { get; set; }
+        public bool hasCrow { get; set; }
+        public object pausedTime { get; set; }
+        public object cancelAt { get; set; }
+    }
+
+    public class LandFreeSlotResponse
+    {
+        public ElementsFreeSlotResponse elements { get; set; }
+        public CapacityFreeSlotResponse capacity { get; set; }
+        public int landId { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
+        public int totalOfElements { get; set; }
+        public int rarity { get; set; }
+    }
+
+    public class ElementsFreeSlotResponse
+    {
+        public int fire { get; set; }
+        public int water { get; set; }
+        public int ice { get; set; }
+        public int wind { get; set; }
+        public int electro { get; set; }
+        public int parasite { get; set; }
+        public int light { get; set; }
+        public int dark { get; set; }
+        public int metal { get; set; }
+    }
+
+    public class CapacityFreeSlotResponse
+    {
+        public int plant { get; set; }
+        public int motherTree { get; set; }
+    }
+
+    public class MetaFreeSlotResponse
+    {
+        public int __v { get; set; }
+        public object nextRandomCrowTime { get; set; }
+        public object resetWatering { get; set; }
+        public object startWatering { get; set; }
+        public DateTime statusChangedAt { get; set; }
+        public DateTime potExpiredAt { get; set; }
+        public object crowAppearAt { get; set; }
+        public object crowLeaveAt { get; set; }
+        public object pauseTime { get; set; }
+        public object cancelAt { get; set; }
+        public object outOfSeasonAt { get; set; }
+        public object farmHarvestedAt { get; set; }
+        public object nextCheckOutOfWaterTime { get; set; }
+        public object outOfWaterAt { get; set; }
+        public object waterEndAt { get; set; }
+    }
+
+    public class ActivetoolFreeSlotResponse
+    {
+        public int count { get; set; }
+        public string _id { get; set; }
+        public int id { get; set; }
+        public string type { get; set; }
+        public int duration { get; set; }
+        public DateTime endTime { get; set; }
+        public DateTime startTime { get; set; }
+    }
+
+    public class AvailableslotFreeSlotResponse
+    {
+        public string _id { get; set; }
+        public bool isDefaultLand { get; set; }
+        public int status { get; set; }
+        public string ownerId { get; set; }
+        public int tokenId { get; set; }
+        public int landId { get; set; }
+        public DateTime createdAt { get; set; }
+        public DateTime updatedAt { get; set; }
+        public int __v { get; set; }
+        public Land1FreeSlotResponse land { get; set; }
+        public int totalAvailable { get; set; }
+        public int availablePlantCapacity { get; set; }
+        public int availableMotherTreeCapacity { get; set; }
+    }
+
+    public class Land1FreeSlotResponse
+    {
+        public string _id { get; set; }
+        public bool isDefaultLand { get; set; }
+        public int landId { get; set; }
+        public int x { get; set; }
+        public int y { get; set; }
+        public Elements1FreeSlotResponse elements { get; set; }
+        public int totalOfElements { get; set; }
+        public Capacity1FreeSlotResponse capacity { get; set; }
+        public int rarity { get; set; }
+        public int __v { get; set; }
+    }
+
+    public class Elements1FreeSlotResponse
+    {
+        public int fire { get; set; }
+        public int water { get; set; }
+        public int ice { get; set; }
+        public int wind { get; set; }
+        public int electro { get; set; }
+        public int parasite { get; set; }
+        public int light { get; set; }
+        public int dark { get; set; }
+        public int metal { get; set; }
+    }
+
+    public class Capacity1FreeSlotResponse
+    {
+        public int plant { get; set; }
+        public int motherTree { get; set; }
+    }
+
 }

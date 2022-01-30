@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,7 @@ namespace BotPVU
 {
     public static class PVUHelper
     {
-        
+
         /// <summary>
         /// Get Farm Info
         /// </summary>
@@ -19,8 +20,12 @@ namespace BotPVU
         {
             try
             {
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms?limit=10&offset=0", "GET");
-                var objRes = JsonSerializer.Deserialize<Models.PVU.GetFarmResponse>(jsonString);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/v2/farms?limit=10&offset=0", "GET");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.GetFarmResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Get Farm Info: " + getMessageFromCode(objRes.status.ToString()));
+                }
                 return objRes;
             }
             catch (Exception ex)
@@ -36,7 +41,7 @@ namespace BotPVU
         /// <param name="farmId">_id</param>
         /// <param name="toolId">1 Small Port, 2 Big POT, 3 water, 4 scarecrow, 5 greenhouse</param>
         /// <returns></returns>
-        public static Models.PVU.GetFarmResponse UseTool(string farmId, int toolId)
+        public static Models.PVU.ApplyToolResponse UseTool(string farmId, int toolId)
         {
             try
             {
@@ -51,8 +56,47 @@ namespace BotPVU
                         validate = "default"
                     }
                 };
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms/apply-tool", "POST", JsonSerializer.Serialize(rq).ToString());
-                var objRes = JsonSerializer.Deserialize<Models.PVU.GetFarmResponse>(jsonString);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/apply-tool", "POST", JsonConvert.SerializeObject(rq).ToString());
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.ApplyToolResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Apply Tool: " + getMessageFromCode(objRes.status.ToString()));
+                }
+                return objRes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="farmId">FreeSlot in Farms _id</param>
+        /// <param name="landId">0</param>
+        /// <param name="plantId">plantid or 1 supling 2 mama</param>
+        /// <param name="sunflowerId"></param>
+        /// <returns></returns>
+        public static Models.PVU.PlantPlantResponse AddPlant(string farmId, string landId, string plantId)
+        {
+            try
+            {
+                var rq = new Models.PVU.PlantPlantRequest()
+                {
+                    farmId= farmId,
+                    landId = landId,
+                    plantId = plantId != "1" && plantId != "2" ? plantId : null ,
+                    sunflowerId = plantId == "1" && plantId == "2" ? plantId : null
+                };
+                var rqJson = JsonConvert.SerializeObject(rq);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farm/add-plant", "POST", rqJson);
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.PlantPlantResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Add Plant: " + getMessageFromCode(objRes.status.ToString()));
+                }
                 return objRes;
             }
             catch (Exception ex)
@@ -63,6 +107,28 @@ namespace BotPVU
 
         }
 
+        public static Models.PVU.FreeSlotResponse GetFreeSlots()
+        {
+            try
+            {
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/free-slots", "GET");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.FreeSlotResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Get Free Slots: " + getMessageFromCode(objRes.status.ToString()));
+                }
+                return objRes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+
+        
+
         /// <summary>
         /// WordTree Response
         /// </summary>
@@ -72,8 +138,12 @@ namespace BotPVU
             try
             {
 
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/world-tree/datas", "GET");
-                var objRes = JsonSerializer.Deserialize<Models.PVU.WordTreeResponse>(jsonString);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/world-tree/datas", "GET");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.WordTreeResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Get Word Tree Info: " + getMessageFromCode(objRes.status.ToString()));
+                }
                 return objRes;
             }
             catch (Exception ex)
@@ -99,8 +169,12 @@ namespace BotPVU
                     amount = amount,
                     sunflowerId = sunFlowerType
                 };
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/buy-sunflowers", "POST", JsonSerializer.Serialize(rq).ToString());
-                var objRes = JsonSerializer.Deserialize<Models.PVU.BuySunFlowerResponse>(jsonString);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/buy-sunflowers", "POST", JsonConvert.SerializeObject(rq).ToString());
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.BuySunFlowerResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Buy Sun Flowers: " + getMessageFromCode(objRes.status.ToString()));
+                }
                 return objRes;
             }
             catch (Exception ex)
@@ -111,17 +185,44 @@ namespace BotPVU
 
         }
         /// <summary>
-        /// Buy Sun Flowers
+        /// HarvestAll
         /// </summary>
-        /// <param name="farmId">amount</param>
-        /// <param name="toolId">1 Sunflower Sapling, 2 Sunflower mama, 3 Sun Box</param>
         /// <returns></returns>
-        public static Models.PVU.BuySunFlowerResponse HarvestAll()
+        public static Models.PVU.ApplyToolResponse HarvestAll()
         {
             try
             {
-                var jsonString = getRequest("https://backend-farm.plantvsundead.com/farms/harvest-all", "POST");
-                var objRes = JsonSerializer.Deserialize<Models.PVU.BuySunFlowerResponse>(jsonString);
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/harvest-all", "POST");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.ApplyToolResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Harvest Plant: " + getMessageFromCode(objRes.status.ToString()));
+                }
+                return objRes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+        /// <summary>
+        /// Harvest Plant
+        /// </summary>
+        /// <param name="plantId"></param>
+        /// <returns></returns>
+        public static Models.PVU.HarvestPlantResponse HarvestPlant(string plantId)
+        {
+            try
+            {
+                
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/farms/" + plantId.ToString() + "/harvest", "POST");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.HarvestPlantResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Harvest Plant: " + getMessageFromCode(objRes.status.ToString()));
+                }
                 return objRes;
             }
             catch (Exception ex)
@@ -132,9 +233,28 @@ namespace BotPVU
 
         }
 
-        public static string checkUserAgent()
+        /// <summary>
+        /// Get Farm Info
+        /// </summary>
+        /// <returns></returns>
+        public static Models.PVU.WeatherTodayResponse GetWeatherToday()
         {
-            return getRequest("https://www.whatismybrowser.com/es/detect/what-is-my-user-agent", "GET");
+            try
+            {
+                var jsonString = getRequest(Models.Configuration.BackendEndpoint + "/weather-today", "GET");
+                var objRes = JsonConvert.DeserializeObject<Models.PVU.WeatherTodayResponse>(jsonString);
+                if (objRes != null && Models.Configuration.PrintLogResponses)
+                {
+                    Console.WriteLine("Get Weather Today: " + getMessageFromCode(objRes.status.ToString()));
+                }
+                return objRes;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
         }
 
         private static string getRequest(string url, string method, string dataToPost = "")
@@ -144,9 +264,7 @@ namespace BotPVU
             // Add a user agent header in case the 
             // requested URI contains a query.
 
-            client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36");
-            client.Headers.Add("Origin", "https://marketplace.plantvsundead.com");
-            client.Headers.Add("Referer", "https://marketplace.plantvsundead.com/");
+            client.Headers.Add("User-Agent", Models.Configuration.UserAgent);
             client.Headers.Add("Authorization", "Bearer Token: " + Models.Configuration.AuthPVUToken);
             if (method == "GET")
             {
@@ -154,10 +272,24 @@ namespace BotPVU
             }
             else if (method == "POST")
             {
+                client.Headers[HttpRequestHeader.ContentType] = "application/json";
                 return client.UploadString(url, dataToPost);
             }
             else return "";
 
+        }
+
+        private static string getMessageFromCode(string v)
+        {
+            try
+            {
+                var messages = Models.Configuration.ResponseMessages.Select(x => new { Code = x.Split('|')[0], Message = x.Split('|')[1] });
+                return messages.FirstOrDefault(x => x.Code == v)?.Message;
+            }
+            catch (Exception exLog)
+            {
+                return "Error " + exLog.Message + " " + exLog.StackTrace;
+            }
         }
     }
 }
