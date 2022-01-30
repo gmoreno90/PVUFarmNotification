@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -145,7 +146,7 @@ namespace BotPVU
 
             // Build configuration
             configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+                .SetBasePath(GetBasePath())
                 .AddJsonFile("appsettings.json", false)
                 .Build();
 
@@ -160,6 +161,11 @@ namespace BotPVU
             Models.Configuration.SmtpUserName = configuration.GetSection("SmtpUserName").Get<string>();
             Models.Configuration.SmtpPassword = configuration.GetSection("SmtpPassword").Get<string>();
 
+        }
+        private static string GetBasePath()
+        {
+            using var processModule = Process.GetCurrentProcess().MainModule;
+            return Path.GetDirectoryName(processModule?.FileName);
         }
     }
 }
